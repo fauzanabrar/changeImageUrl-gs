@@ -54,6 +54,7 @@ function formatSheet() {
   changeimagetourl();
 }
 
+
 // This function splits rows based on comma-separated values in column E and adds new rows with the split values
 function splitAndAddRowsBelow() {
   let run = true;
@@ -142,9 +143,18 @@ function addImageUrlFromExistedCellObject(cellValue, currentRange, addedRange) {
     try {
       const formula = currentRange.getFormula();
       const imageUrl = formula.match(/\"(.+?)\"/)[1];
-
+      
+      const width = 400;
+      const imageId = imageUrl.split('id=')[1];
+      const srcfile = DriveApp.getFileById(imageId);
+      const newImageUrl = Drive.Files.get(srcfile.getId()).thumbnailLink.replace(/\=s.+/, "=s" + width);
+      
+      insertImageIntoCell(newImageUrl, currentRange);
       insertImageUrlIntoCell(imageUrl, addedRange);
     } catch (e) {
+      
+      if(e instanceof TypeError) return;
+      
       Logger.info("Error : " + e);
     }
   }
@@ -164,10 +174,21 @@ function changeDriveUrlToImageUrl(
     const adaptImageURL = cellValue.split("/")[5];
     const imageUrl = "https://drive.google.com/uc?id=" + adaptImageURL;
 
+
+
     if (useFormula) {
       cellRange.setFormula(`=IMAGE("${imageUrl}",2)`);
     } else {
-      insertImageIntoCell(imageUrl, cellRange);
+      try{
+        insertImageIntoCell(imageUrl, cellRange);
+      }catch(e){
+        const width = 400;
+        const imageId = imageUrl.split('id=')[1];
+        const srcfile = DriveApp.getFileById(imageId);
+        const newImageUrl = Drive.Files.get(srcfile.getId()).thumbnailLink.replace(/\=s.+/, "=s" + width);
+
+        insertImageIntoCell(newImageUrl, cellRange);
+      }
     }
 
     if (imageUrlRange) {
