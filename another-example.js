@@ -15,33 +15,41 @@ const COLUMN = {
     NAME: "No",
     INDEX_COLUMN: 3,
   },
-  PENERIMA: {
-    NAME: "Penerima",
-    INDEX_COLUMN: 4,
-  },
   PENGIRIM: {
     NAME: "Pengirim",
+    INDEX_COLUMN: 4,
+  },
+  DEPARTEMEN: {
+    NAME: "Departemen",
     INDEX_COLUMN: 5,
+  },
+  PENERIMA: {
+    NAME: "Penerima",
+    INDEX_COLUMN: 6,
   },
   DOKUMEN: {
     NAME: "Dokumen",
-    INDEX_COLUMN: 6,
+    INDEX_COLUMN: 7,
+  },
+  EKSPEDISI: {
+    NAME: "Ekspedisi",
+    INDEX_COLUMN: 8,
   },
   IMAGE_UPLOAD: {
     NAME: "Image Upload",
-    INDEX_COLUMN: 7,
+    INDEX_COLUMN: 9,
   },
   SIGNATURE: {
     NAME: "Signature",
-    INDEX_COLUMN: 8,
+    INDEX_COLUMN: 10,
   },
   IMAGE_URL: {
     NAME: "Image URL",
-    INDEX_COLUMN: 9,
+    INDEX_COLUMN: 11,
   },
   SIGNATURE_URL: {
     NAME: "Signature URL",
-    INDEX_COLUMN: 10,
+    INDEX_COLUMN: 12,
   },
 };
 
@@ -63,7 +71,7 @@ function formatSheet() {
 }
 
 
-// This function splits rows based on comma-separated values in column E and adds new rows with the split values
+// This function splits rows based on comma-separated values in column F and adds new rows with the split values
 function splitAndAddRowsBelow() {
   let run = true;
 
@@ -76,17 +84,17 @@ function splitAndAddRowsBelow() {
     const newData = [];
     for (let i = 0; i < numRows; i++) {
       const row = data[i];
-      const eValue = row[COLUMN.PENGIRIM.INDEX_COLUMN - 1]; // Assuming column E is the fifth column (index 4)
+      const fValue = row[COLUMN.PENERIMA.INDEX_COLUMN - 1]; // Assuming column F is the fifth column (index 4)
 
-      // Check if column E value contains commas
-      if (eValue?.toString().includes(",")) {
-        const eValues = eValue.split(",");
-        const numEValues = eValues.length;
+      // Check if column F value contains commas
+      if (fValue?.toString().includes(",")) {
+        const fValues = fValue.split(",");
+        const numFValues = fValues.length;
 
-        // Duplicate row for each split value in column E
-        for (let j = 0; j < numEValues; j++) {
+        // Duplicate row for each split value in column F
+        for (let j = 0; j < numFValues; j++) {
           const newRow = row.slice(0); // Duplicate the entire row
-          newRow[COLUMN.PENGIRIM.INDEX_COLUMN - 1] = eValues[j].trim(); // Replace column E with split value
+          newRow[COLUMN.PENERIMA.INDEX_COLUMN - 1] = fValues[j].trim(); // Replace column F with split value
           newData.push(newRow);
 
           if (j === 0) {
@@ -110,36 +118,38 @@ function splitAndAddRowsBelow() {
   }
 }
 
-// This function changes image URLs in columns G and H to display the images in Google Sheets
+// This function changes image URLs in columns I and J to display the images in Google Sheets
 function changeimagetourl() {
   const dataRange = sheet.getRange(2, COLUMN.IMAGE_UPLOAD.INDEX_COLUMN, sheet.getLastRow() - 1, 2);
 
-  // Retrieves the data range for columns G (column 7) and H (column 8)
+  // Retrieves the data range for columns I (column 9) and J (column 10)
   const data = dataRange.getValues();
 
   for (let i = 0; i < data.length; i++) {
-    const valueG = data[i][0];
-    const valueH = data[i][1];
+    const valueI = data[i][0];
+    const valueJ = data[i][1];
 
     addImageUrlFromExistedCellObject(
-      valueG,
+      valueI,
       sheet.getRange(i + 2, COLUMN.IMAGE_UPLOAD.INDEX_COLUMN),
       sheet.getRange(i + 2, COLUMN.IMAGE_URL.INDEX_COLUMN)
     );
     addImageUrlFromExistedCellObject(
-      valueH,
+      valueJ,
       sheet.getRange(i + 2, COLUMN.SIGNATURE.INDEX_COLUMN),
       sheet.getRange(i + 2, COLUMN.SIGNATURE_URL.INDEX_COLUMN)
     );
 
-    // Checks if the value in column G is a string and contains 'drive.google.com'
+    // Checks if the value in column I is a string and contains 'drive.google.com'
     changeDriveUrlToImageUrl(
-      valueG,
+      valueI,
       sheet.getRange(i + 2, COLUMN.IMAGE_UPLOAD.INDEX_COLUMN),
       sheet.getRange(i + 2, COLUMN.IMAGE_URL.INDEX_COLUMN)
     );
+    
+    // Checks if the value in column J is a string and contains 'drive.google.com'
     changeDriveUrlToImageUrl(
-      valueH,
+      valueJ,
       sheet.getRange(i + 2, COLUMN.SIGNATURE.INDEX_COLUMN),
       sheet.getRange(i + 2, COLUMN.SIGNATURE_URL.INDEX_COLUMN)
     );
